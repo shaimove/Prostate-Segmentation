@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-from monai.losses import DiceLoss
 
 class DiceLoss(nn.Module):
     def __init__(self):

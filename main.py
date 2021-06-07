@@ -3,6 +3,7 @@ import torch.cuda
 from torch import nn
 import torch.nn.functional as F
 from torch.utils import data
+from torchsummary import summary
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,7 +49,13 @@ gen_opt = torch.optim.Adam(gen.parameters(), lr=lr)
 disc = Discriminator(input_dim + real_dim).to(device)
 disc_opt = torch.optim.Adam(disc.parameters(), lr=lr)
 
-#%%
+print('Generator model')
+summary(gen, (1, 256, 256))
+
+print('Discriminator model')
+summary(disc, [(1, 256, 256),(1, 256, 256)])
+
+#%% Phase 1: Training the pix2pix U-net
 
 mean_generator_loss = 0
 mean_discriminator_loss = 0
@@ -84,6 +91,24 @@ plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
 plt.title('Loss for pix2pix network')
 plt.legend()
 
+
+
+#%% Phase 2: train only the Discriminator on curropted images
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
 
 
 

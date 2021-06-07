@@ -23,12 +23,14 @@ class DatasetMRI(Dataset):
         self.X = np.load(self.path + 'X_' + self.mode + '.npy')
         self.Y = np.load(self.path + 'Y_' + self.mode + '.npy')
         
-        # initiate transform
-        self.createTransforms()
-        
         # stats: mean and std of the training set
         self.mean = stats[0]
         self.std = stats[1]
+        
+        # initiate transform
+        self.createTransforms()
+        
+        
         
     def createTransforms(self):
         # create basic transforms
