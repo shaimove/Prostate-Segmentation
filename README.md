@@ -8,7 +8,7 @@ Let's define the following: I_k image,  S_k ground truth segmentation map, S_k_h
 
 Illustration of the architecture: 
 
-![](C:\Kaggle\BrainSegmentation\Results\explanation1.png)
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/explanation1.png)
 
 The authors of [1] first trained U in an unregularized manner with L2 norm, then they trained an auto-encoder with corrupted ground truth segmentation maps (or by using predicted segmentation maps resulted from early epochs). Then, the auto-encoder was used to fine-tune U with the following loss function:
 
@@ -41,7 +41,7 @@ $$
 
 Illustration of the GAN training:
 
-![](C:\Kaggle\BrainSegmentation\Results\explanation2.png)
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/explanation2.png)
 
 [1] Ravishankar H., Venkataramani R., Thiruvenkadam S., Sudhakar P., Vaidya V. (2017) Learning and Incorporating Shape Models for Semantic Segmentation. In: Descoteaux M., Maier-Hein L., Franz A., Jannin P., Collins D., Duchesne S. (eds) Medical Image Computing and Computer-Assisted Intervention − MICCAI 2017. MICCAI 2017. Lecture Notes in Computer Science, vol 10433. Springer, Cham. https://doi.org/10.1007/978-3-319-66182-7_24
 
