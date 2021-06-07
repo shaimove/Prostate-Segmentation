@@ -35,8 +35,11 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 n_epochs = 20
 lambda_recon = 200
 input_dim = 1
+target_shape = 256
 real_dim = 1
 lr = 0.001
+display_step = 5
+save_model = False
 
 # Define loss function for generator and discriminator
 adv_criterion = nn.BCEWithLogitsLoss() 
@@ -59,7 +62,7 @@ summary(disc, [(1, 256, 256),(1, 256, 256)])
 
 mean_generator_loss = 0
 mean_discriminator_loss = 0
-
+cur_step = 0
 
 for epoch in range(n_epochs):
     ##################
@@ -78,10 +81,34 @@ for epoch in range(n_epochs):
         
         ### Update generator ###
         gen_opt.zero_grad() # zeros gradient before calculating loss
-        gen_loss = losses.get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
+        fake,gen_loss = losses.get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
         gen_loss.backward() # Update gradients
         gen_opt.step() # Update optimizer
         
+        # Keep track of the average discriminator loss
+        mean_discriminator_loss += disc_loss.item() / display_step
+        # Keep track of the average generator loss
+        mean_generator_loss += gen_loss.item() / display_step
+        
+        ### Visualization code ###
+        if cur_step % display_step == 0:
+            if cur_step > 0:
+                print(f"Epoch {epoch}: Step {cur_step}: Generator (U-Net) loss: {mean_generator_loss}, Discriminator loss: {mean_discriminator_loss}")
+            else:
+                print("Pretrained initial state")
+                utils.show_tensor_images(condition, size=(input_dim, target_shape, target_shape))
+                utils.show_tensor_images(real, size=(real_dim, target_shape, target_shape))
+                utils.show_tensor_images(fake, size=(real_dim, target_shape, target_shape))
+                mean_generator_loss = 0
+                mean_discriminator_loss = 0
+                # You can change save_model to True if you'd like to save the model
+                if save_model:
+                    torch.save({'gen': gen.state_dict(),
+                        'gen_opt': gen_opt.state_dict(),
+                        'disc': disc.state_dict(),
+                        'disc_opt': disc_opt.state_dict()
+                    }, f"pix2pix_{cur_step}.pth")
+        cur_step += 1
         
 #%% Plot training results
 plt.figure()

@@ -153,7 +153,24 @@ class UNet(nn.Module):
         
         self.conv_final = nn.Conv2d(hidden_channels, output_channels, kernel_size=1)
         self.sigmoid = torch.nn.Sigmoid()
-
+    
+        self._init_weights()
+    
+    
+    def _init_weights(self):
+        # initiate with Xavier initialization
+        for m in self.modules():
+            if type(m) in {nn.Conv2d,nn.ConvTranspose2d}:
+                nn.init.xavier_normal_(m.weight) # Weight of layers
+                
+                if m.bias is not None: 
+                    m.bias.data.fill_(0.01)  # if we have bias
+                    
+            if type(m) in {nn.BatchNorm2d}:
+                nn.init.normal_(m.weight) # Weight of layers
+                if m.bias is not None:
+                    m.bias.data.fill_(0.01)  # if we have bias
+                    
     def forward(self, x):
         '''
         x: image tensor of shape (batch size, channels, height, width)

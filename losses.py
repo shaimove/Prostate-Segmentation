@@ -48,7 +48,7 @@ def get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lam
     # Add the two losses, weighting the reconstruction loss appropriately.
     gen_loss = gen_adv_loss + lambda_recon * gen_rec_loss
 
-    return gen_loss
+    return fake,gen_loss
 
 
 
