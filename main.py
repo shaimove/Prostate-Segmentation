@@ -58,6 +58,7 @@ ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
 
 # pack models to send to training
 models_opt_loss = [adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt]
+datasets = [train_dataset,train_loader]
 
 print('Generator model')
 summary(gen, (1, 256, 256))
@@ -118,7 +119,7 @@ torch.save({'gen': gen.state_dict(),
             'gen_opt': gen_opt.state_dict(),
             'disc': disc.state_dict(),
             'disc_opt': disc_opt.state_dict()
-            }, f"pix2pix.pth")       
+            }, "pix2pix.pth")       
     
 #%% Plot training results
 plt.figure()
