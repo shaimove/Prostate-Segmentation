@@ -27,17 +27,25 @@ class DatasetMRI(Dataset):
         self.mean = stats[0]
         self.std = stats[1]
         
-        # initiate transform
-        self.createTransforms()
+        # initiate transforms
+        self.TransformsX()
+        self.TransformsY()
+        
+        # Do we want to perform tranforms? 
+        self.transforms = True
         
         
         
-    def createTransforms(self):
+    def TransformsX(self):
         # create basic transforms
-        self.transforms = transforms.Compose([
+        self.transformsX = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(mean=[self.mean],std=[self.std])])
     
+    def TransformsY(self):
+        # create basic transforms
+        self.transformsY = transforms.Compose([
+            transforms.ToTensor()])
     
     def __len__(self):
         return self.X.shape[0]
@@ -48,8 +56,8 @@ class DatasetMRI(Dataset):
         
         # preform transforms
         if self.transforms:
-            image = self.transforms(image).unsqueeze(0).float()
-            seg_map = self.transforms(seg_map).unsqueeze(0).float()
+            image = self.transformsX(image).float()
+            seg_map = self.transformsY(seg_map).float()
         
         # create dictionary
         sample = {'image': image, 'Segmentation': seg_map}

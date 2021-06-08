@@ -77,6 +77,6 @@ def show_tensor_images(image_tensor, num_images=9, size=(1, 256, 256)):
     image_shifted = image_tensor
     image_unflat = image_shifted.detach().cpu().view(-1, *size)
     image_grid = make_grid(image_unflat[:num_images], nrow=3)
-    plt.imshow(image_grid.permute(1, 2, 0).squeeze())
+    plt.imshow(image_grid.permute(1, 2, 0).squeeze(),cmap='gray')
     plt.show()
 

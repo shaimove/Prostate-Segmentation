@@ -17,8 +17,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # Load raw dataset and split to train/validation/test, need to be done only once!
 #(mean,std) = utils.ReadSplitData('../PROMISE12/',split = [0.7,0.15,0.15])
 stats = [0.41836,0.245641]
-batch_size_train = 32
-batch_size_validation = 32
+batch_size_train = 4
+batch_size_validation = 4
 
 # define dataset and dataloader for training
 train_dataset = DatasetMRI('../PROMISE12/',stats,mode='train')
