@@ -61,6 +61,7 @@ class ConvBlock(nn.Module):
         x = self.maxpool(x)
         
         return x
+#%% UpConv for pix2pix
 
 class UPConvBlock(nn.Module):
     '''
@@ -196,7 +197,7 @@ class UNet(nn.Module):
         
         return x_final
 
-#%% Discriminator for pix2pix , instead of NLayerDiscriminator
+#%% Discriminator for pix2pix
 
 class Discriminator(nn.Module):
     '''
@@ -215,6 +216,22 @@ class Discriminator(nn.Module):
         self.contract3 = ConvBlock(hidden_channels * 4)
         self.contract4 = ConvBlock(hidden_channels * 8)
         self.final = nn.Conv2d(hidden_channels * 16, 1, kernel_size=1)
+        
+        self._init_weights()
+    
+    def _init_weights(self):
+        # initiate with Xavier initialization
+        for m in self.modules():
+            if type(m) in {nn.Conv2d,nn.ConvTranspose2d}:
+                nn.init.xavier_normal_(m.weight) # Weight of layers
+                
+                if m.bias is not None: 
+                    m.bias.data.fill_(0.01)  # if we have bias
+                    
+            if type(m) in {nn.BatchNorm2d}:
+                nn.init.normal_(m.weight) # Weight of layers
+                if m.bias is not None:
+                    m.bias.data.fill_(0.01)  # if we have bias
 
     def forward(self, x, y):
         x = torch.cat([x, y], axis=1)
@@ -225,5 +242,113 @@ class Discriminator(nn.Module):
         x4 = self.contract4(x3)
         xn = self.final(x4)
         return xn
+
+
+#%% UpCONV for AE (Auto-encoder)
+
+class UPConvBlockAE(nn.Module):
+    '''
+    UPConvBlock Class:
+    Performs an upsampling, followed by two convolutions
+    input_channels: the number of channels to expect from a given input
+    '''
+    def __init__(self, input_channels):
+        super(UPConvBlockAE, self).__init__()
+        
+        self.upsample = nn.ConvTranspose2d(input_channels, input_channels, kernel_size=2,stride=2)
+        
+        self.conv1 = nn.Conv2d(input_channels, input_channels // 2, kernel_size=2)
+        self.batchnorm1 = nn.BatchNorm2d(input_channels // 2)
+        
+        self.conv2 = nn.Conv2d(input_channels // 2, input_channels // 2, kernel_size=3, padding=1)
+        self.batchnorm2 = nn.BatchNorm2d(input_channels // 2)
+        
+        self.activation = nn.ReLU()
+
+    def forward(self, x):
+        '''
+        x: image tensor of shape (batch size, channels, height, width)
+        skip_con_x: the image tensor from the contracting path (from the opposing block of x)
+                    for the skip connection
+        '''
+        x = self.upsample(x)
+        x = self.conv1(x)
+        x = self.batchnorm1(x)
+
+        x = self.conv2(x)
+        x = self.batchnorm2(x)
+        
+        x = self.activation(x)
+        
+        return x
+
+    
+#%% AE to reconstruct the articale
+
+class AE(nn.Module):
+    '''
+    AE Class
+    A series of 4 contracting blocks followed by 4 expanding blocks to 
+    transform an input image into the corresponding paired image, with an upfeature
+    layer at the start and a downfeature layer at the end.
+    Values:
+        input_channels: the number of channels to expect from a given input
+        output_channels: the number of channels to expect for a given output
+    '''
+    def __init__(self, input_channels, output_channels, hidden_channels=16):
+        super(AE, self).__init__()
+        
+        self.conv_first = nn.Conv2d(input_channels, hidden_channels, kernel_size=1)
+        
+        self.conv1 = ConvBlock(hidden_channels)
+        self.conv2 = ConvBlock(hidden_channels * 2)
+        self.conv3 = ConvBlock(hidden_channels * 4)
+        self.conv4 = ConvBlock(hidden_channels * 8)
+        
+        self.expand1 = UPConvBlockAE(hidden_channels * 16)
+        self.expand2 = UPConvBlockAE(hidden_channels * 8)
+        self.expand3 = UPConvBlockAE(hidden_channels * 4)
+        self.expand4 = UPConvBlockAE(hidden_channels * 2)
+        
+        self.conv_final = nn.Conv2d(hidden_channels, output_channels, kernel_size=1)
+        self.sigmoid = torch.nn.Sigmoid()
+    
+        self._init_weights()
+    
+    
+    def _init_weights(self):
+        # initiate with Xavier initialization
+        for m in self.modules():
+            if type(m) in {nn.Conv2d,nn.ConvTranspose2d}:
+                nn.init.xavier_normal_(m.weight) # Weight of layers
+                
+                if m.bias is not None: 
+                    m.bias.data.fill_(0.01)  # if we have bias
+                    
+            if type(m) in {nn.BatchNorm2d}:
+                nn.init.normal_(m.weight) # Weight of layers
+                if m.bias is not None:
+                    m.bias.data.fill_(0.01)  # if we have bias
+                    
+    def forward(self, x):
+        '''
+        x: image tensor of shape (batch size, channels, height, width)
+        '''
+        x0 = self.conv_first(x)
+        x1 = self.conv1(x0)
+        x2 = self.conv2(x1)
+        x3 = self.conv3(x2)
+        Ex = self.conv4(x3)
+
+        x5 = self.expand1(Ex)
+        x6 = self.expand2(x5)
+        x7 = self.expand3(x6)
+        x8 = self.expand4(x7)
+
+        xn = self.conv_final(x8)
+        x_final = self.sigmoid(xn)
+        
+        return Ex,x_final
+
 
 
