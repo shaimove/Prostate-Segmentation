@@ -33,95 +33,33 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 #%% Training
 # Define training parameters
 n_epochs = 200
-lambda_recon = 200
 input_dim = 1
 target_shape = 256
 real_dim = 1
 lr = 0.0001
 display_step = 10
-path = '../PROMISE12/pix2pix results/'
+path = '../PROMISE12/unet results/'
 
 # pack parameters to send to training
-params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step,path]
+params = [n_epochs,input_dim,target_shape,real_dim,lr,display_step,path]
 
-# Define loss function for generator and discriminator
-adv_criterion = nn.BCEWithLogitsLoss() 
-recon_criterion = losses.DiceLoss()
+# Define loss function for unet
+criterion = losses.DiceLoss()
 
 # Define models 
-gen = UNet(input_dim, real_dim).to(device)
-gen_opt = torch.optim.Adam(gen.parameters(), lr=lr)
-
-disc = Discriminator(input_dim + real_dim).to(device)
-disc_opt = torch.optim.Adam(disc.parameters(), lr=lr)
+unet = UNet(input_dim, real_dim,AE=True).to(device)
+unet_opt = torch.optim.Adam(unet.parameters(), lr=lr)
 
 # pack models to send to training
-models_opt_loss = [adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt]
+models_opt_loss = [unet,unet_opt,criterion]
 datasets = [train_dataset,train_loader]
 
-print('Generator model')
-summary(gen, (1, 256, 256))
+print('U-net model')
+summary(unet, (1, 256, 256))
 
-print('Discriminator model')
-summary(disc, [(1, 256, 256),(1, 256, 256)])
+#%% Phase 1: train U-net
 
-#%% Phase 1: Training the pix2pix U-net
-models_opt_loss = Training.TrainerPix2Pix(params, models_opt_loss,datasets)
-adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
-
-
-#%% Phase 2: train only the Discriminator on curropted images
-
-
-
-
-
-
-
-
-
-
-
-
-
-#%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
-
-
-
-#%%
-ae = AE(input_dim, real_dim).to(device)
-ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
-
-print('AE model')
-summary(ae, (1, 256, 256))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+models_opt_loss= Training.TrainerUnet(params, models_opt_loss,datasets)
 
 
 
