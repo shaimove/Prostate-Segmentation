@@ -6,7 +6,7 @@ from torchsummary import summary
 
 import numpy as np
 import matplotlib.pyplot as plt
-from datasets import DatasetMRI
+from datasets import DatasetProstate
 from models import UNet,Discriminator,AE
 import utils 
 import losses
@@ -17,30 +17,31 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # Load raw dataset and split to train/validation/test, need to be done only once!
 #(mean,std) = utils.ReadSplitData('../PROMISE12/',split = [0.7,0.15,0.15])
 stats = [0.41836,0.245641]
-batch_size_train = 4
-batch_size_validation = 4
+batch_size_train = 32
+batch_size_validation = 32
 
 # define dataset and dataloader for training
-train_dataset = DatasetMRI('../PROMISE12/',stats,mode='train')
+train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train')
 train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True)
 
 # define dataset and dataloader for validation
-validation_dataset = DatasetMRI('../PROMISE12/',stats,mode='validation')
+validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 
 #%% Training
 # Define training parameters
-n_epochs = 20
+n_epochs = 50
 lambda_recon = 200
 input_dim = 1
 target_shape = 256
 real_dim = 1
 lr = 0.001
-display_step = 5
+display_step = 10
+path = '../PROMISE12/pix2pix results/'
 
 # pack parameters to send to training
-params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step]
+params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step,path]
 
 # Define loss function for generator and discriminator
 adv_criterion = nn.BCEWithLogitsLoss() 
@@ -53,9 +54,6 @@ gen_opt = torch.optim.Adam(gen.parameters(), lr=lr)
 disc = Discriminator(input_dim + real_dim).to(device)
 disc_opt = torch.optim.Adam(disc.parameters(), lr=lr)
 
-ae = AE(input_dim, real_dim).to(device)
-ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
-
 # pack models to send to training
 models_opt_loss = [adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt]
 datasets = [train_dataset,train_loader]
@@ -66,16 +64,15 @@ summary(gen, (1, 256, 256))
 print('Discriminator model')
 summary(disc, [(1, 256, 256),(1, 256, 256)])
 
-print('AE model')
-summary(ae, (1, 256, 256))
-
 #%% Phase 1: Training the pix2pix U-net
+generator_loss = []
+discriminator_loss = []
 
-mean_generator_loss = 0
-mean_discriminator_loss = 0
-cur_step = 0
 
 for epoch in range(n_epochs):
+    # declare loss variabels for every epoch
+    mean_generator_loss = 0
+    mean_discriminator_loss = 0
     ##################
     ### TRAIN LOOP ###
     ##################
@@ -96,39 +93,38 @@ for epoch in range(n_epochs):
         gen_loss.backward() # Update gradients
         gen_opt.step() # Update optimizer
         
+        ### Loss ###        
         # Keep track of the average discriminator loss
-        mean_discriminator_loss += disc_loss.item() / display_step
+        mean_discriminator_loss += disc_loss.item() / len(train_loader)
         # Keep track of the average generator loss
-        mean_generator_loss += gen_loss.item() / display_step
+        mean_generator_loss += gen_loss.item() / len(train_loader)
         
-        ### Visualization code ###
-        if cur_step % display_step == 0:
-            if cur_step > 0:
-                print(f"Epoch {epoch}: Step {cur_step}: Generator (U-Net) loss: {mean_generator_loss}, Discriminator loss: {mean_discriminator_loss}")
-            else:
-                print("Pretrained initial state")
-                utils.show_tensor_images(condition, size=(input_dim, target_shape, target_shape))
-                utils.show_tensor_images(real, size=(real_dim, target_shape, target_shape))
-                utils.show_tensor_images(fake, size=(real_dim, target_shape, target_shape))
-                mean_generator_loss = 0
-                mean_discriminator_loss = 0                
-        cur_step += 1
+    ### Visualization every epoch ###
+    print('Epoch %d: Generator loss: %.2f, Discriminator loss: %.3f'
+          % (epoch, mean_generator_loss, mean_discriminator_loss))
+    utils.show_images(condition, real, fake, 3, epoch, path,
+                      size = (input_dim, target_shape, target_shape))
+    
+    generator_loss.append(mean_generator_loss)
+    discriminator_loss.append(mean_discriminator_loss)
 
 # save the model at the end
+path_model = path + "pix2pix.pth"
 torch.save({'gen': gen.state_dict(),
             'gen_opt': gen_opt.state_dict(),
             'disc': disc.state_dict(),
             'disc_opt': disc_opt.state_dict()
-            }, "pix2pix.pth")       
+            }, path_model)       
     
-#%% Plot training results
+# Plot training results
 plt.figure()
-plt.plot(range(n_epochs),mean_generator_loss,label='Generator Loss')
-plt.plot(range(n_epochs),mean_discriminator_loss,label='Discriminator Loss')
+plt.plot(range(n_epochs),generator_loss,label='Generator Loss')
+plt.plot(range(n_epochs),discriminator_loss,label='Discriminator Loss')
 plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
 plt.title('Loss for pix2pix network')
 plt.legend()
-
+result_path = path + 'results.png'
+plt.savefig(result_path)
 
 
 #%% Phase 2: train only the Discriminator on curropted images
@@ -148,6 +144,13 @@ plt.legend()
 #%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
 
 
+
+#%%
+ae = AE(input_dim, real_dim).to(device)
+ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
+
+print('AE model')
+summary(ae, (1, 256, 256))
 
 
 

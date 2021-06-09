@@ -80,3 +80,34 @@ def show_tensor_images(image_tensor, num_images=9, size=(1, 256, 256)):
     plt.imshow(image_grid.permute(1, 2, 0).squeeze(),cmap='gray')
     plt.show()
 
+
+def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 256),):
+    '''
+    Function for visualizing images: Given a tensor of images, number of images, and
+    size per image, plots and prints the images in an uniform grid.
+    '''
+    # send images to cpu
+    condition = condition.detach().cpu().view(-1, *size).squeeze(1).numpy()
+    real = real.detach().cpu().view(-1, *size).squeeze(1).numpy()
+    fake = fake.detach().cpu().view(-1, *size).squeeze(1).numpy()
+    
+    # choose only num_images
+    condition = condition[:num_images]
+    real = real[:num_images]
+    fake = fake[:num_images]
+    
+    # create figure
+    fig = plt.figure(figsize = (8,8))
+    
+    for p,i in enumerate(range(1,3*num_images+1,3)):
+        # plot condition
+        fig.add_subplot(num_images,3,i); plt.imshow(condition[p,::],cmap='gray')
+        # plot real
+        fig.add_subplot(num_images,3,i+1); plt.imshow(real[p,::],cmap='gray')
+        # plot fake
+        fig.add_subplot(num_images,3,i+2); plt.imshow(fake[p,::],cmap='gray')
+    
+    # save figure
+    path = path + 'epoch ' + str(epoch) + '.png'
+    plt.savefig(path)
+    plt.close('all')

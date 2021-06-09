@@ -10,7 +10,7 @@ from torchvision import transforms
 # beacuse the data set is so small, we will read all the data at init stage
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class DatasetMRI(Dataset):
+class DatasetProstate(Dataset):
     
     def __init__(self,path,stats,mode='train'):
         # root folder is training or testing

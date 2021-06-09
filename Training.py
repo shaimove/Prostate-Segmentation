@@ -5,22 +5,25 @@ from torch import nn
 import numpy as np
 import matplotlib.pyplot as plt
 import utils
+import losses
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def TrainerPix2Pix(params, models_opt_loss,datasets):
     # Unpack parameters for training and models
-    n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step = params
+    n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step,path = params
     adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
     train_dataset,train_loader = datasets
 
     
-    # Define iterators
-    mean_generator_loss = 0
-    mean_discriminator_loss = 0
-    cur_step = 0
+    generator_loss = []
+    discriminator_loss = []
     
-        
+    
     for epoch in range(n_epochs):
+        # declare loss variabels for every epoch
+        mean_generator_loss = 0
+        mean_discriminator_loss = 0
         ##################
         ### TRAIN LOOP ###
         ##################
@@ -41,23 +44,20 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
             gen_loss.backward() # Update gradients
             gen_opt.step() # Update optimizer
             
+            ### Loss ###        
             # Keep track of the average discriminator loss
-            mean_discriminator_loss += disc_loss.item() / display_step
+            mean_discriminator_loss += disc_loss.item() / len(train_loader)
             # Keep track of the average generator loss
-            mean_generator_loss += gen_loss.item() / display_step
+            mean_generator_loss += gen_loss.item() / len(train_loader)
             
-            ### Visualization code ###
-            if cur_step % display_step == 0:
-                if cur_step > 0:
-                    print(f"Epoch {epoch}: Step {cur_step}: Generator (U-Net) loss: {mean_generator_loss}, Discriminator loss: {mean_discriminator_loss}")
-                else:
-                    print("Pretrained initial state")
-                    utils.show_tensor_images(condition, size=(input_dim, target_shape, target_shape))
-                    utils.show_tensor_images(real, size=(real_dim, target_shape, target_shape))
-                    utils.show_tensor_images(fake, size=(real_dim, target_shape, target_shape))
-                    mean_generator_loss = 0
-                    mean_discriminator_loss = 0                
-            cur_step += 1
+        ### Visualization every epoch ###
+        print('Epoch %d: Generator loss: %.2f, Discriminator loss: %.3f'
+              % (epoch, mean_generator_loss, mean_discriminator_loss))
+        utils.show_images(condition, real, fake, 3, epoch, path,
+                          size = (input_dim, target_shape, target_shape))
+        
+        generator_loss.append(mean_generator_loss)
+        discriminator_loss.append(mean_discriminator_loss)
     
     # save the model at the end
     torch.save({'gen': gen.state_dict(),
@@ -66,13 +66,12 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
                 'disc_opt': disc_opt.state_dict()
                 }, "pix2pix.pth")       
         
-    #%% Plot training results
+    # Plot training results
     plt.figure()
-    plt.plot(range(n_epochs),mean_generator_loss,label='Generator Loss')
-    plt.plot(range(n_epochs),mean_discriminator_loss,label='Discriminator Loss')
+    plt.plot(range(n_epochs),generator_loss,label='Generator Loss')
+    plt.plot(range(n_epochs),discriminator_loss,label='Discriminator Loss')
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for pix2pix network')
     plt.legend()
-
-
-
+    result_path = path + 'results.png'
+    plt.savefig(result_path)
