@@ -60,11 +60,12 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
         discriminator_loss.append(mean_discriminator_loss)
     
     # save the model at the end
+    path_model = path + "pix2pix.pth"
     torch.save({'gen': gen.state_dict(),
                 'gen_opt': gen_opt.state_dict(),
                 'disc': disc.state_dict(),
                 'disc_opt': disc_opt.state_dict()
-                }, "pix2pix.pth")       
+                }, path_model)       
         
     # Plot training results
     plt.figure()
@@ -75,3 +76,7 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
     plt.legend()
     result_path = path + 'results.png'
     plt.savefig(result_path)
+    
+    models_opt_loss = [adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt]
+    
+    return models_opt_loss
