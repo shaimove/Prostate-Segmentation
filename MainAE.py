@@ -52,15 +52,24 @@ unet_opt = torch.optim.Adam(unet.parameters(), lr=lr)
 
 # pack models to send to training
 models_opt_loss = [unet,unet_opt,criterion]
-datasets = [train_dataset,train_loader]
+datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 
 print('U-net model')
 summary(unet, (1, 256, 256))
 
-#%% Phase 1: train U-net
+#%% Phase 1: train U-net 
 
 models_opt_loss= Training.TrainerUnet(params, models_opt_loss,datasets)
 
+
+
+
+#%% Phase 2: Train VA on curropted data
+
+
+
+
+#%% Phase 3: Fine tunning 
 
 
 

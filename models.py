@@ -144,9 +144,9 @@ class UNet(nn.Module):
         # start squence
         self.conv_first = nn.Conv2d(input_channels, hidden_channels, kernel_size=1)
         
-        self.conv1 = ConvBlock(hidden_channels, use_dropout)
-        self.conv2 = ConvBlock(hidden_channels * 2, use_dropout)
-        self.conv3 = ConvBlock(hidden_channels * 4, use_dropout)
+        self.conv1 = ConvBlock(hidden_channels, use_dropout=use_dropout)
+        self.conv2 = ConvBlock(hidden_channels * 2, use_dropout=use_dropout)
+        self.conv3 = ConvBlock(hidden_channels * 4, use_dropout=use_dropout)
         self.conv4 = ConvBlock(hidden_channels * 8)
         self.conv5 = ConvBlock(hidden_channels * 16)
         self.conv6 = ConvBlock(hidden_channels * 32)

@@ -108,6 +108,9 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
         fig.add_subplot(num_images,3,i+2); plt.imshow(fake[p,::],cmap='gray')
     
     # save figure
+    fig.suptitle('MRI image/ Ground Truth Segmentation / Output Segmentation')
     path = path + 'epoch ' + str(epoch) + '.png'
     plt.savefig(path)
     plt.close('all')
+    
+    

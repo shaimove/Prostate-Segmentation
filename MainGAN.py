@@ -35,9 +35,9 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 n_epochs = 200
 lambda_recon = 200
 input_dim = 1
-target_shape = 256
 real_dim = 1
-lr = 0.0001
+target_shape = 256
+lr = 0.001
 display_step = 10
 path = '../PROMISE12/pix2pix results/'
 
@@ -57,8 +57,9 @@ disc_opt = torch.optim.Adam(disc.parameters(), lr=lr)
 
 # pack models to send to training
 models_opt_loss = [adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt]
-datasets = [train_dataset,train_loader]
+datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 
+# Print models structure
 print('Generator model')
 summary(gen, (1, 256, 256))
 
@@ -68,6 +69,8 @@ summary(disc, [(1, 256, 256),(1, 256, 256)])
 #%% Phase 1: Training the pix2pix U-net
 models_opt_loss = Training.TrainerPix2Pix(params, models_opt_loss,datasets)
 adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
+
+
 
 
 #%% Phase 2: train only the Discriminator on curropted images
