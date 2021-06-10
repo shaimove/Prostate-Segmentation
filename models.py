@@ -135,11 +135,7 @@ class UNet(nn.Module):
     '''
     def __init__(self, input_channels, output_channels, hidden_channels=16, AE = False):
         super(UNet, self).__init__()
-        # Dropout only for GAN
-        if AE == False: 
-            use_dropout = True
-        else:
-            use_dropout = False
+        use_dropout = False # dropout don't work!!!
         
         # start squence
         self.conv_first = nn.Conv2d(input_channels, hidden_channels, kernel_size=1)

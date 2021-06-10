@@ -37,7 +37,7 @@ lambda_recon = 200
 input_dim = 1
 real_dim = 1
 target_shape = 256
-lr = 0.001
+lr = 0.0001
 display_step = 10
 path = '../PROMISE12/pix2pix results/'
 
