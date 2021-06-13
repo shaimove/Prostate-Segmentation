@@ -85,7 +85,7 @@ validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation', Di
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 # Define loss function 
-criterion = nn.MSELoss()
+criterion = losses.DiceLoss()
 path = '../PROMISE12/disc results/'
 
 # pack models to send to training
