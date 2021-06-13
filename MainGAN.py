@@ -48,7 +48,7 @@ params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step,
 adv_criterion = nn.BCEWithLogitsLoss() 
 recon_criterion = losses.DiceLoss()
 
-# Define models 
+# Define models
 gen = UNet(input_dim, real_dim).to(device)
 gen_opt = torch.optim.Adam(gen.parameters(), lr=lr)
 
@@ -71,13 +71,13 @@ models_opt_loss = Training.TrainerPix2Pix(params, models_opt_loss,datasets)
 adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
 
 
-
-
 #%% Phase 2: train only the Discriminator on curropted images
+# Define AE 
+ae = AE(input_dim, real_dim).to(device)
+ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
 
-
-
-
+print('AE model')
+summary(ae, (1, 256, 256))
 
 
 
@@ -88,15 +88,17 @@ adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
 
 
 #%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
+# Load trained network
+path_model = path + "pix2pix.pth"
+
+gen.load_state_dict(torch.load(path_model['gen']))
+gen_opt.load_state_dict(torch.load(path_model['gen_opt']))
+disc.load_state_dict(torch.load(path_model['disc']))
+disc_opt.load_state_dict(torch.load(path_model['disc_opt']))
 
 
 
-#%%
-ae = AE(input_dim, real_dim).to(device)
-ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
 
-print('AE model')
-summary(ae, (1, 256, 256))
 
 
 

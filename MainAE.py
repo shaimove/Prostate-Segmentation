@@ -39,6 +39,7 @@ real_dim = 1
 lr = 0.0001
 display_step = 10
 path = '../PROMISE12/unet results/'
+path = '../PROMISE12/unet_early_epoch/'
 
 # pack parameters to send to training
 params = [n_epochs,input_dim,target_shape,real_dim,lr,display_step,path]
