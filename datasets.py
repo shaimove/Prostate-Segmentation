@@ -45,9 +45,6 @@ class DatasetProstate(Dataset):
         self.TransformsX()
         self.TransformsY()
         
-
-        
-        
         
     def TransformsX(self):
         # create basic transforms

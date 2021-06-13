@@ -47,7 +47,7 @@ params = [n_epochs,input_dim,target_shape,real_dim,lr,path]
 criterion = losses.DiceLoss()
 
 # Define models 
-unet = UNet(input_dim, real_dim,AE=True).to(device)
+unet = UNet(input_dim, real_dim).to(device)
 unet_opt = torch.optim.Adam(unet.parameters(), lr=lr)
 
 # pack models to send to training

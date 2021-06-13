@@ -86,4 +86,40 @@ def get_disc_loss(gen, disc, real, condition, adv_criterion):
     
     return disc_loss
     
+#%% identity loss
+
+def get_identity_loss(real, gen, identity_criterion):
+    '''
+    Return the identity loss of the generator given inputs
+    (and the generated images for testing purposes).
+    Parameters:
+        real: the real segmentation 
+        gen: the generator takes segmentations and returns the images and "try" to fix them
+        identity_criterion: the identity loss function; takes the real segmentation and
+                        returns the identity loss (which you aim to minimize)
+    '''
+    identity = gen(real)
+    identity_loss = identity_criterion(identity,real)
     
+    return identity_loss, identity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
