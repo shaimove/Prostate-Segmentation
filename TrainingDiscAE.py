@@ -11,9 +11,84 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #%% Trainer for the discriminator
 
+def TrainAE(params, models_opt_loss,datasets):
+    # Unpack parameters for training and models
+    n_epochs,input_dim,target_shape,real_dim,lr,path = params
+    ae,ae_opt,criterion = models_opt_loss
+    train_dataset,train_loader,validation_dataset,validation_loader = datasets
 
+    # Loss vectors
+    train_loss_vec = []; valid_loss_vec = []
 
+    for epoch in range(n_epochs):
+        ##################
+        ### TRAIN LOOP ###
+        ##################
+        ae.train(); train_loss = 0
+        
+        for batch in train_loader:
+            # get data from batch and send to GPU
+            condition = batch['image'].to(device)
+            real = batch['Segmentation'].to(device)
+            
+            ### Update model ###
+            ae_opt.zero_grad() 
+            Ex,output = ae(condition)
+            ae_loss = criterion(output,real)
+            ae_loss.backward(retain_graph=True) 
+            ae_opt.step() 
 
+            ### Loss ###        
+            train_loss += ae_loss.item() / len(train_loader)
+
+        train_loss_vec.append(train_loss)
+        
+        #######################
+        ### VALIDATION LOOP ###
+        #######################
+        ae.eval(); valid_loss = 0
+        with torch.no_grad():
+            for batch in validation_loader:
+                # get data from batch and send to GPU
+                condition = batch['image'].to(device)
+                real = batch['Segmentation'].to(device)
+                
+                ### Loss ### 
+                Ex,output = ae(condition)
+                ae_loss = criterion(output,real)
+                valid_loss += ae_loss.item() / len(validation_loader)
+        
+        valid_loss_vec.append(valid_loss)
+        
+        ######################################
+        ### Epoch Summary and save results ###
+        ######################################
+        print('Epoch %d: Train MSE loss: %.3f, Validation MSE loss %.3f' 
+              % (epoch, train_loss, valid_loss))
+        utils.show_images(condition, real, output, 3, epoch, path,
+                          size = (input_dim, target_shape, target_shape))
+        
+        
+    # save the model at the end
+    path_model = path + "ae.pth"
+    torch.save({'ae': ae.state_dict(),
+                'ae_opt': ae_opt.state_dict(),
+                }, path_model)       
+        
+    # Plot training results
+    plt.figure()
+    plt.plot(range(n_epochs),train_loss_vec,label='Training MSE Loss')
+    plt.plot(range(n_epochs),valid_loss_vec,label='Validation MSE Loss')
+    plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
+    plt.title('Loss for AE network'); plt.legend()
+    
+    result_path = path + 'results.png'
+    plt.savefig(result_path)
+    
+    # pack back
+    models_opt_loss = [ae,ae_opt,criterion]
+    
+    return models_opt_loss
 
 
 

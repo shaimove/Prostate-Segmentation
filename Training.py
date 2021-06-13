@@ -124,7 +124,7 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
 
 def TrainerUnet(params, models_opt_loss,datasets):
     # Unpack parameters for training and models
-    n_epochs,input_dim,target_shape,real_dim,lr,display_step,path = params
+    n_epochs,input_dim,target_shape,real_dim,lr,path = params
     unet,unet_opt,criterion = models_opt_loss
     train_dataset,train_loader,validation_dataset,validation_loader = datasets
 

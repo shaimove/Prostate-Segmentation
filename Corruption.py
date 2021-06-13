@@ -12,10 +12,11 @@ path = '../PROMISE12/'
 path_model = '../PROMISE12/unet_early_epoch/unet.pth'
 stats = [0.41836,0.245641]
 input_dim = 1; real_dim = 1; 
+mode = '_train'
 
 # load images
-x_train = np.load(path + 'X_train.npy')
-y_train = np.load(path + 'Y_train.npy')
+x_train = np.load(path + 'X' + mode + '.npy')
+y_train = np.load(path + 'Y' + mode + '.npy')
 # load model
 unet = UNet(input_dim, real_dim,AE=True).to(device)
 unet.load_state_dict(torch.load(path_model)['unet'])
@@ -41,12 +42,12 @@ for i in tqdm.tqdm(range(num_of_img)):
         # Prepare back to save as numpy array
         y_out = y_out.cpu().squeeze(0).detach().numpy()
         y_out = np.expand_dims(y_out,3)
-        y_out = np.where(y_out > 0.3,y_out,0)
+        y_out = np.where(y_out > 0.3,1,0)
         # add to y_corr
         y_corr[i,::] = y_out
 
 # save images
-np.save(path + 'Y_corr.npy',y_corr)
+np.save(path + 'Y_corr' + mode + '.npy',y_corr)
 
 #%% Plot images
 num_of_img_dis = 5

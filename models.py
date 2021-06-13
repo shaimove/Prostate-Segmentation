@@ -265,6 +265,9 @@ class UPConvBlockAE(nn.Module):
         self.conv2 = nn.Conv2d(input_channels // 2, input_channels // 2, kernel_size=3, padding=1)
         self.batchnorm2 = nn.BatchNorm2d(input_channels // 2)
         
+        self.conv3 = nn.Conv2d(input_channels // 2, input_channels // 2, kernel_size=2, padding=1)
+        self.batchnorm3 = nn.BatchNorm2d(input_channels // 2)
+        
         self.activation = nn.ReLU()
 
     def forward(self, x):
@@ -279,6 +282,9 @@ class UPConvBlockAE(nn.Module):
 
         x = self.conv2(x)
         x = self.batchnorm2(x)
+        
+        x = self.conv3(x)
+        x = self.batchnorm3(x)
         
         x = self.activation(x)
         

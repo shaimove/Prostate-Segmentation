@@ -73,11 +73,7 @@ adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
 
 #%% Phase 2: train only the Discriminator on curropted images
 # Define AE 
-ae = AE(input_dim, real_dim).to(device)
-ae_opt = torch.optim.Adam(ae.parameters(), lr=lr)
 
-print('AE model')
-summary(ae, (1, 256, 256))
 
 
 

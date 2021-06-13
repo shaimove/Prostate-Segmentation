@@ -113,4 +113,3 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
     plt.savefig(path)
     plt.close('all')
     
-    

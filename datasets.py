@@ -12,17 +12,24 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DatasetProstate(Dataset):
     
-    def __init__(self,path,stats,mode='train'):
+    def __init__(self,path,stats,mode='train',TrainSR = False):
         # root folder is training or testing
         self.path = path 
         
         # mode of dataset (train,validation,test)
         self.mode = mode
+        self.TrainSR = TrainSR
         
         # read file according to mode
-        self.X = np.load(self.path + 'X_' + self.mode + '.npy')
-        self.Y = np.load(self.path + 'Y_' + self.mode + '.npy')
+        if not self.TrainSR:
+            self.X = np.load(self.path + 'X_' + self.mode + '.npy')
+            self.Y = np.load(self.path + 'Y_' + self.mode + '.npy')
         
+        # If we use corrupt images, load Y_corr_train and Y_corr_validation
+        if self.TrainSR:
+            self.X = np.load(self.path + 'Y_corr_' + self.mode + '.npy')
+            self.Y = np.load(self.path + 'Y_' + self.mode + '.npy')
+            
         # stats: mean and std of the training set
         self.mean = stats[0]
         self.std = stats[1]
@@ -56,8 +63,15 @@ class DatasetProstate(Dataset):
         
         # preform transforms
         if self.transforms:
-            image = self.transformsX(image).float()
-            seg_map = self.transformsY(seg_map).float()
+            # False for MRI images, and True for curropted segmentation images
+            if not self.TrainSR: 
+                image = self.transformsX(image).float()
+                seg_map = self.transformsY(seg_map).float()
+            else:
+                image = self.transformsY(image).float()
+                seg_map = self.transformsY(seg_map).float()
+                
+            
         
         # create dictionary
         sample = {'image': image, 'Segmentation': seg_map}
