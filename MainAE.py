@@ -63,11 +63,11 @@ models_opt_loss = Training.TrainerUnet(params, models_opt_loss,datasets)
 
 #%% Phase 2: Train VA on curropted data
 # define dataset and dataloader for training
-train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train',TrainSR = True)
+train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train',TrainAE = True)
 train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True)
 
 # define dataset and dataloader for validation
-validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation',TrainSR = True)
+validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation',TrainAE = True)
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 # define loss function

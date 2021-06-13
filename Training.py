@@ -13,7 +13,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def TrainerPix2Pix(params, models_opt_loss,datasets):
     # Unpack parameters for training and models
-    n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,display_step,path = params
+    n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,path = params
     adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
     train_dataset,train_loader,validation_dataset,validation_loader = datasets
 
