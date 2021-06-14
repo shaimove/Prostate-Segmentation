@@ -25,19 +25,29 @@ input_dim = 1; real_dim = 1;
 test_dataset = DatasetProstate('../PROMISE12/',stats,mode='test')
 test_loader = data.DataLoader(test_dataset,batch_size=batch_size_test,shuffle=True)
 
-# upload generator from GAN model
-path_GAN = '../PROMISE12/GAN finetune results/unet.pth'
+# upload generator from GAN model without Shape regularization
+path_GAN = '../PROMISE12/pix2pix results/pix2pix.pth'
 gen = UNet(input_dim, real_dim).to(device)
 gen.load_state_dict(torch.load(path_GAN)['gen'])
 
-# upload unet from original paper
-path_AE = '../PROMISE12/AE finetune results/'
+# upload generator from GAN model with Shape regularization
+path_GANSR = '../PROMISE12/GAN finetune results/pix2pix.pth'
+genSR = UNet(input_dim, real_dim).to(device)
+genSR.load_state_dict(torch.load(path_GANSR)['gen'])
+
+# upload unet from original paper without Shape regularization
+path_unet = '../PROMISE12/unet results/unet.pth'
 unet = UNet(input_dim, real_dim).to(device)
-unet.load_state_dict(torch.load(path_AE)['unet'])
+unet.load_state_dict(torch.load(path_unet)['unet'])
+
+# upload unet from original paper with Shape regularization
+path_unetSR = '../PROMISE12/AE finetune results/unet.pth'
+unetSR = UNet(input_dim, real_dim).to(device)
+unetSR.load_state_dict(torch.load(path_unetSR)['unet'])
 
 #%% Loop over results for GAN model
-loss_GAN = 0
-loss_AE = 0
+loss_gen = 0; loss_genSR = 0
+loss_unet = 0; loss_unetSR = 0
 
 for batch in test_loader:
     with torch.no_grad():
@@ -48,19 +58,26 @@ for batch in test_loader:
         # output from gen and unet
         output_gen = gen(condition)
         output_unet = unet(condition)
+        output_genSR = genSR(condition)
+        output_unetSR = unetSR(condition)
         
         # Dice loss
-        loss_gen = losses.DiceLoss(output_gen,real)
-        loss_unet = losses.DiceLoss(output_unet,real)
+        loss_gen_batch = losses.DiceLoss(output_gen,real)
+        loss_unet_batch = losses.DiceLoss(output_unet,real)
+        loss_genSR_batch = losses.DiceLoss(output_genSR,real)
+        loss_unetSR_batch = losses.DiceLoss(output_unetSR,real)
         
         # add to loss
-        loss_GAN +=  loss_gen.item() / len(test_loader)
-        loss_AE +=  loss_unet.item() / len(test_loader)
-
+        loss_gen +=  loss_gen_batch.item() / len(test_loader)
+        loss_unet +=  loss_unet_batch.item() / len(test_loader)
+        loss_genSR += loss_genSR_batch.item() / len(test_loader)
+        loss_unetSR += loss_unetSR_batch.item() / len(test_loader)
                 
 # print results
-print('Dice Loss for AE model is %.4f' % loss_AE)
-print('Dice Loss for GAN model is %.4f' % loss_GAN)
+print('Dice Loss for GAN without SR is %.4f' % loss_gen)
+print('Dice Loss for unet without SR is %.4f' % loss_unet)
+print('Dice Loss for GAN with SR is %.4f' % loss_genSR)
+print('Dice Loss for unet with SR is %.4f' % loss_unetSR)
 
 
 
