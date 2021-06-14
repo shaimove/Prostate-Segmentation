@@ -104,11 +104,12 @@ models_opt_loss = TrainingDiscAE.TrainDiscriminator(params, models_opt_loss,data
 
 #%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
 # Load trained network
-path_model = path + "pix2pix.pth"
-gen.load_state_dict(torch.load(path_model)['gen'])
-gen_opt.load_state_dict(torch.load(path_model)['gen_opt'])
-disc.load_state_dict(torch.load(path_model)['disc'])
-disc_opt.load_state_dict(torch.load(path_model)['disc_opt'])
+path_gen = paths[0] + "pix2pix.pth"
+path_disc = paths[1] + "disc.pth"
+gen.load_state_dict(torch.load(path_gen)['gen'])
+gen_opt.load_state_dict(torch.load(path_gen)['gen_opt'])
+disc.load_state_dict(torch.load(path_disc)['disc'])
+disc_opt.load_state_dict(torch.load(path_disc)['disc_opt'])
 
 # define dataset and dataloader for training
 train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train')
@@ -117,7 +118,6 @@ train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle
 # define dataset and dataloader for validation
 validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
-
 
 # Define loss function 
 recon_criterion = losses.DiceLoss()
