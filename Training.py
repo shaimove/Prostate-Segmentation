@@ -67,8 +67,8 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
                 real = batch['Segmentation'].to(device)
         
                 ### get losses ###
-                disc_loss = losses.get_disc_loss(gen, disc, real, condition, adv_criterion)
-                fake,gen_loss = losses.get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
+                disc_loss = losses.Discriminator_Loss(gen, disc, real, condition, adv_criterion)
+                fake,gen_loss = losses.Generator_Loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
                 
                 ### Loss for batch ### 
                 valid_disc_loss += disc_loss.item() / len(validation_loader)

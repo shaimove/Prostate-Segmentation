@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 
+#%% DiceLoss
+
 class DiceLoss(nn.Module):
     def __init__(self):
         super(DiceLoss, self).__init__()
@@ -15,9 +17,9 @@ class DiceLoss(nn.Module):
         
         return 1 - dice
 
+#%% Generator_Loss
 
-
-def get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon):
+def Generator_Loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon):
     '''
     Return the loss of the generator given inputs.
     Parameters:
@@ -51,9 +53,9 @@ def get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lam
     return fake,gen_loss
 
 
+#%% Discriminator_Loss
 
-
-def get_disc_loss(gen, disc, real, condition, adv_criterion):
+def Discriminator_Loss(gen, disc, real, condition, adv_criterion):
     '''
     Return the loss of the discriminator given inputs.
     Parameters:
@@ -86,27 +88,108 @@ def get_disc_loss(gen, disc, real, condition, adv_criterion):
     
     return disc_loss
     
-#%% identity loss
 
-def get_identity_loss(real, gen, identity_criterion):
+
+#%% U-net Fine Tunning loss
+
+def Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent):
     '''
-    Return the identity loss of the generator given inputs
-    (and the generated images for testing purposes).
-    Parameters:
-        real: the real segmentation 
-        gen: the generator takes segmentations and returns the images and "try" to fix them
-        identity_criterion: the identity loss function; takes the real segmentation and
-                        returns the identity loss (which you aim to minimize)
+    Loss function of the U-net fine tunning according to the paper.
+
+    Parameters
+    ----------
+    unet : TYPE
+        DESCRIPTION.
+    ae : TYPE
+        DESCRIPTION.
+    real : TYPE
+        DESCRIPTION.
+    condition : TYPE
+        DESCRIPTION.
+    criterion : TYPE
+        DESCRIPTION.
+    lambda_reco : TYPE
+        DESCRIPTION.
+    lambda_latent : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    unet_FT_loss : TYPE
+        DESCRIPTION.
+
     '''
-    identity = gen(real)
-    identity_loss = identity_criterion(identity,real)
+    # Calculate output of U-net
+    output = unet(condition)
     
-    return identity_loss, identity
+    # Calculate the output of the AE, using the U-net output
+    output_latent,output_ae = ae(output)
+    
+    # output should be the same!
+    loss_output = criterion(output,output_ae)
+    
+    # find the latent space representation of the segementation map
+    real_latent,_ = ae(real)
+    
+    # output and real should be the same in the latent space!
+    loss_latent = criterion(output_latent,real_latent)
+    
+    # loss between segmentation maps
+    loss_reco = criterion(output,real)
+    
+    # final loss
+    unet_FT_loss = loss_output + lambda_latent * loss_latent + lambda_reco * loss_reco
+    
+
+    return output,unet_FT_loss
 
 
+#%% GAN Fine Tunning loss
 
+def GAN_FT_Loss(gen,disc,real,condition,adv_criterion,recon_criterion,lambda_reco):
+    '''
+    
 
+    Parameters
+    ----------
+    gen : TYPE
+        DESCRIPTION.
+    disc : TYPE
+        DESCRIPTION.
+    real : TYPE
+        DESCRIPTION.
+    condition : TYPE
+        DESCRIPTION.
+    adv_criterion : TYPE
+        DESCRIPTION.
+    recon_criterion : TYPE
+        DESCRIPTION.
+    lambda_reco : TYPE
+        DESCRIPTION.
 
+    Returns
+    -------
+    gen_FT_loss : TYPE
+        DESCRIPTION.
+
+    '''
+
+    # create segmentation map
+    fake = gen(condition)
+    
+    # move throw the discriminator 
+    disc_fake = disc(fake,condition)
+    
+    # Calculate the adversarial loss.
+    gen_adv_loss = adv_criterion(disc_fake,torch.ones_like(disc_fake))
+    
+    # Calculate the reconstruction loss.
+    loss_reco = recon_criterion(real,fake)
+    
+    # final loss
+    gen_FT_loss = gen_adv_loss + lambda_reco * loss_reco
+    
+    return fake,gen_FT_loss
 
 
 

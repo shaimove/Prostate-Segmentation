@@ -7,13 +7,20 @@ from torchsummary import summary
 import numpy as np
 import matplotlib.pyplot as plt
 from datasets import DatasetProstate
-from models import UNet,Discriminator,AE
+from models import UNet,Discriminator
 import utils 
 import losses
 import Training
 import TrainingDiscAE
+import Training_Finetune
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+# create folders to save results
+path = '../PROMISE12/'
+folders = ['pix2pix','Disc','pix2pixSR']
+paths = utils.CreateFolders(path,folders)
 
 #%% Create dataset
 # Load raw dataset and split to train/validation/test, need to be done only once!
@@ -29,7 +36,6 @@ input_dim = 1
 real_dim = 1
 target_shape = 256
 lr = 0.0001
-path = '../PROMISE12/pix2pix results/'
 
 # Define models
 gen = UNet(input_dim, real_dim).to(device)
@@ -55,7 +61,7 @@ validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 # pack parameters to send to training
-params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,path]
+params = [n_epochs,lambda_recon,input_dim,target_shape,real_dim,lr,paths[0]]
 
 # Define loss function for generator and discriminator
 adv_criterion = nn.BCEWithLogitsLoss() 
@@ -86,10 +92,9 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 
 # Define loss function 
 criterion = losses.DiceLoss()
-path = '../PROMISE12/disc results/'
 
 # pack models to send to training
-params = [n_epochs,input_dim,target_shape,real_dim,lr,path]
+params = [n_epochs,input_dim,target_shape,real_dim,lr,paths[1]]
 models_opt_loss = [disc,disc_opt,criterion]
 datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 
@@ -99,13 +104,33 @@ models_opt_loss = TrainingDiscAE.TrainDiscriminator(params, models_opt_loss,data
 
 #%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
 # Load trained network
+path_model = path + "pix2pix.pth"
+gen.load_state_dict(torch.load(path_model)['gen'])
+gen_opt.load_state_dict(torch.load(path_model)['gen_opt'])
+disc.load_state_dict(torch.load(path_model)['disc'])
+disc_opt.load_state_dict(torch.load(path_model)['disc_opt'])
+
+# define dataset and dataloader for training
+train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train')
+train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True)
+
+# define dataset and dataloader for validation
+validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
+validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 
+# Define loss function 
+recon_criterion = losses.DiceLoss()
+adv_criterion = nn.BCEWithLogitsLoss() 
+lambda_reco = 1
 
+# pack models to send to training
+params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,paths[2]]
+models_opt_loss = [gen,gen_opt,disc,disc_opt,adv_criterion,recon_criterion]
+datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 
-
-
-
+# Train the model
+models_opt_loss = Training_Finetune.TrainerGAN_FT(params, models_opt_loss,datasets)
 
 
 

@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torchvision.utils import make_grid
+import os
 
 
+#%% Split data from kaggale
 
 def ReadSplitData(path_read,path_write=None,split = [0.7,0.15,0.15]):
     '''
@@ -69,7 +66,7 @@ def ReadSplitData(path_read,path_write=None,split = [0.7,0.15,0.15]):
     return stats
 
 
-
+#%% Print images
 def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 256),):
     '''
     Function for visualizing images: Given a tensor of images, number of images, and
@@ -102,3 +99,20 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
     plt.savefig(path)
     plt.close('all')
     
+    return None
+    
+#%% Create folders
+
+def CreateFolders(path,folders):
+    
+    new_folders = []
+    
+    for folder in folders:
+        full_path = os.path.join(path,folder)
+        os.mkdir(full_path)
+        new_folders.append(full_path)
+        
+    
+    
+    return new_folders
+

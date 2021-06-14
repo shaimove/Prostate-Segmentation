@@ -1,9 +1,7 @@
 # Test.py
 import torch
 import torch.cuda
-from torch import nn
 from torch.utils import data
-from torchsummary import summary
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,22 +24,22 @@ test_dataset = DatasetProstate('../PROMISE12/',stats,mode='test')
 test_loader = data.DataLoader(test_dataset,batch_size=batch_size_test,shuffle=True)
 
 # upload generator from GAN model without Shape regularization
-path_GAN = '../PROMISE12/pix2pix results/pix2pix.pth'
+path_GAN = '../PROMISE12/pix2pix/pix2pix.pth'
 gen = UNet(input_dim, real_dim).to(device)
 gen.load_state_dict(torch.load(path_GAN)['gen'])
 
 # upload generator from GAN model with Shape regularization
-path_GANSR = '../PROMISE12/GAN finetune results/pix2pix.pth'
+path_GANSR = '../PROMISE12/pix2pixSR/pix2pixSR.pth'
 genSR = UNet(input_dim, real_dim).to(device)
 genSR.load_state_dict(torch.load(path_GANSR)['gen'])
 
 # upload unet from original paper without Shape regularization
-path_unet = '../PROMISE12/unet results/unet.pth'
+path_unet = '../PROMISE12/unet/unet.pth'
 unet = UNet(input_dim, real_dim).to(device)
 unet.load_state_dict(torch.load(path_unet)['unet'])
 
 # upload unet from original paper with Shape regularization
-path_unetSR = '../PROMISE12/AE finetune results/unet.pth'
+path_unetSR = '../PROMISE12/unetSR/unetSR.pth'
 unetSR = UNet(input_dim, real_dim).to(device)
 unetSR.load_state_dict(torch.load(path_unetSR)['unet'])
 
