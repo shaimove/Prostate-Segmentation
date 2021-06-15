@@ -70,7 +70,7 @@ def TrainAE(params, models_opt_loss,datasets):
         
         
     # save the model at the end
-    path_model = path + "ae.pth"
+    path_model = path + "/ae.pth"
     torch.save({'ae': ae.state_dict(),
                 'ae_opt': ae_opt.state_dict(),
                 }, path_model)       
@@ -171,7 +171,7 @@ def TrainDiscriminator(params, models_opt_loss,datasets):
         
         
     # save the model at the end
-    path_model = path + "disc.pth"
+    path_model = path + "/disc.pth"
     torch.save({'disc': disc.state_dict(),
                 'disc_opt': disc_opt.state_dict(),
                 }, path_model)       

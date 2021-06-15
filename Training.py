@@ -89,7 +89,7 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
         
         
     ### save the model at the end ###
-    path_model = path + "pix2pix.pth"
+    path_model = path + "/pix2pix.pth"
     torch.save({'gen': gen.state_dict(),
                 'gen_opt': gen_opt.state_dict(),
                 'disc': disc.state_dict(),
@@ -181,7 +181,7 @@ def TrainerUnet(params, models_opt_loss,datasets):
         
         
     # save the model at the end
-    path_model = path + "unet.pth"
+    path_model = path + "/unet.pth"
     torch.save({'unet': unet.state_dict(),
                 'unet_opt': unet_opt.state_dict(),
                 }, path_model)       

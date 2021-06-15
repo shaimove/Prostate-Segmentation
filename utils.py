@@ -95,7 +95,7 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
     
     # save figure
     fig.suptitle('MRI image/ Ground Truth Segmentation / Output Segmentation')
-    path = path + 'epoch ' + str(epoch) + '.png'
+    path = path + '/epoch ' + str(epoch) + '.png'
     plt.savefig(path)
     plt.close('all')
     
@@ -103,13 +103,14 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
     
 #%% Create folders
 
-def CreateFolders(path,folders):
+def CreateFolders(path,folders,folder_exists = False):
     
     new_folders = []
     
     for folder in folders:
         full_path = os.path.join(path,folder)
-        os.mkdir(full_path)
+        if folder_exists:
+            os.mkdir(full_path)
         new_folders.append(full_path)
         
     

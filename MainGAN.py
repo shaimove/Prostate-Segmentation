@@ -26,8 +26,8 @@ paths = utils.CreateFolders(path,folders)
 # Load raw dataset and split to train/validation/test, need to be done only once!
 #(mean,std) = utils.ReadSplitData('../PROMISE12/',split = [0.7,0.15,0.15])
 stats = [0.41836,0.245641]
-batch_size_train = 32
-batch_size_validation = 32
+batch_size_train = 16
+batch_size_validation = 16
 
 # Define training parameters
 n_epochs = 200
@@ -78,7 +78,7 @@ adv_criterion,recon_criterion,gen,gen_opt,disc,disc_opt = models_opt_loss
 
 #%% Phase 2: train only the Discriminator on curropted images
 # load disriminator
-path_model = path + "pix2pix.pth"
+path_model = paths[0] + "/pix2pix.pth"
 disc.load_state_dict(torch.load(path_model)['disc'])
 disc_opt.load_state_dict(torch.load(path_model)['disc_opt'])
 
@@ -104,8 +104,8 @@ models_opt_loss = TrainingDiscAE.TrainDiscriminator(params, models_opt_loss,data
 
 #%% Phase 3: freeze the discriminator weight, and fine-tuning the U-net
 # Load trained network
-path_gen = paths[0] + "pix2pix.pth"
-path_disc = paths[1] + "disc.pth"
+path_gen = paths[0] + "/pix2pix.pth"
+path_disc = paths[1] + "/disc.pth"
 gen.load_state_dict(torch.load(path_gen)['gen'])
 gen_opt.load_state_dict(torch.load(path_gen)['gen_opt'])
 disc.load_state_dict(torch.load(path_disc)['disc'])

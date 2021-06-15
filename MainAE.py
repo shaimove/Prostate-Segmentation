@@ -26,8 +26,8 @@ paths = utils.CreateFolders(path,folders)
 # Load raw dataset and split to train/validation/test, need to be done only once!
 #(mean,std) = utils.ReadSplitData('../PROMISE12/',split = [0.7,0.15,0.15])
 stats = [0.41836,0.245641]
-batch_size_train = 32
-batch_size_validation = 32
+batch_size_train = 16
+batch_size_validation = 16
 
 # Training
 # Define training parameters
@@ -95,8 +95,8 @@ datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 models_opt_loss = TrainingDiscAE.TrainAE(params, models_opt_loss,datasets)
 
 #%% Phase 3: Fine tunning 
-path_uent = paths[0] + "unet.pth"
-path_ae = paths[1] + "ae.pth"
+path_uent = paths[0] + "/unet.pth"
+path_ae = paths[1] + "/ae.pth"
 unet.load_state_dict(torch.load(path_uent)['unet'])
 unet_opt.load_state_dict(torch.load(path_uent)['unet_opt'])
 ae.load_state_dict(torch.load(path_ae)['ae'])
@@ -112,8 +112,8 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 
 # define loss function
 criterion = nn.MSELoss()
-lambda_reco = 1
-lambda_latent = 1
+lambda_reco = 0.05
+lambda_latent = 0.05
 
 # pack params, models and datasets
 params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,lambda_latent,paths[2]]

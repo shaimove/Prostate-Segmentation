@@ -38,7 +38,7 @@ def TrainerGAN_FT(params, models_opt_loss,datasets):
             gen_opt.step()
             
             ### Loss for batch ###        
-            train_loss_vec += gen_loss.item() / len(train_loader)
+            train_loss += gen_loss.item() / len(train_loader)
         
         train_loss_vec.append(train_loss)
         
@@ -61,13 +61,13 @@ def TrainerGAN_FT(params, models_opt_loss,datasets):
         ######################################
         ### Epoch Summary and save results ###
         ######################################
-        print('Epoch %d: Train Dice loss: %.3f, Validation Dice loss %.3f' 
+        print('Epoch %d: Train loss: %.3f, Validation loss %.3f' 
               % (epoch, train_loss, valid_loss))
         utils.show_images(condition, real, fake, 3, epoch, path,
                           size = (input_dim, target_shape, target_shape))
 
     # save the model at the end
-    path_model = path + "pix2pixSR.pth"
+    path_model = path + "/pix2pixSR.pth"
     torch.save({'gen': gen.state_dict(),
                 'gen_opt': gen_opt.state_dict(),
                 }, path_model)       
@@ -129,7 +129,7 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
                 real = batch['Segmentation'].to(device)
                 
                 ### Loss ### 
-                fake,unet_loss = criterion(unet,ae,real,condition,criterion,lambda_reco,lambda_latent)
+                fake,unet_loss = losses.Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent)
                 valid_loss += unet_loss.item() / len(validation_loader)
         
         valid_loss_vec.append(valid_loss)
@@ -137,14 +137,14 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
         ######################################
         ### Epoch Summary and save results ###
         ######################################
-        print('Epoch %d: Train Dice loss: %.3f, Validation Dice loss %.3f' 
+        print('Epoch %d: Train loss: %.3f, Validation loss %.3f' 
               % (epoch, train_loss, valid_loss))
         utils.show_images(condition, real, output, 3, epoch, path,
                           size = (input_dim, target_shape, target_shape))
     
     
     # save the model at the end
-    path_model = path + "unetSR.pth"
+    path_model = path + "/unetSR.pth"
     torch.save({'unet': unet.state_dict(),
                 'unet_opt': unet_opt.state_dict(),
                 }, path_model)       
