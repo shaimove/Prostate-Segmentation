@@ -4,7 +4,7 @@
 
 In the following work, we suggest changing the architecture suggested by Ravishankar et al [1]. Ravishankar suggested improving semantic segmentation of simple U-net architecture, by adding shape-regularization obtain by convolutional auto-encoder. 
 
-Let's define the following:  $I_{k}$ image,  $S_{k}$  ground truth segmentation map, S_k_hat learned segmentation map by vanilla U-net. An auto-encoder with encoder E projecting the segmentation maps into a latent space M and then a decoder R reconstruct the segmentation map from the latent space  M to improved shape-regularized segmentation map.
+Let's define the following:  $$I_{k}$$ image,  $$S_{k}$$  ground truth segmentation map, S_k_hat learned segmentation map by vanilla U-net. An auto-encoder with encoder E projecting the segmentation maps into a latent space M and then a decoder R reconstruct the segmentation map from the latent space  M to improved shape-regularized segmentation map.
 
 Illustration of the architecture: 
 
@@ -44,7 +44,9 @@ Illustration of the GAN training:
 $$
 L_D = \mathbf{E}[logD(I_k,S_k)] + \mathbf{E}[log(1-D(I_k,G[I_k]_c))]
 $$
-**the third phase**, fine-tuning of the generator (U-net), training the with Dice loss on the semantic segmentation, and adversarial loss (BCE Logits) from the discriminator after shape regularization.  
+
+
+**The third phase**, fine-tuning of the generator (U-net), training the with Dice loss on the semantic segmentation, and adversarial loss (BCE Logits) from the discriminator after shape regularization.  
 $$
 L_G = \mathbf{E}[logD(I_k,S_k)] + \lambda*Dice(S_k,G[I_k])
 $$
