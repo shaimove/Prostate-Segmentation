@@ -102,6 +102,13 @@ unet_opt.load_state_dict(torch.load(path_uent)['unet_opt'])
 ae.load_state_dict(torch.load(path_ae)['ae'])
 ae_opt.load_state_dict(torch.load(path_ae)['ae_opt'])
 
+# define loss function
+criterion = nn.MSELoss()
+lambda_reco = 1
+lambda_latent = 1
+batch_size_train = 16
+batch_size_validation = 16
+
 # define dataset and dataloader for training
 train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train')
 train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True)
@@ -109,13 +116,6 @@ train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle
 # define dataset and dataloader for validation
 validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
-
-# define loss function
-criterion = nn.MSELoss()
-lambda_reco = 1
-lambda_latent = 1
-batch_size_train = 16
-batch_size_validation = 16
 
 # pack params, models and datasets
 params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,lambda_latent,paths[2]]

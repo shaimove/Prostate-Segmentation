@@ -111,6 +111,13 @@ gen_opt.load_state_dict(torch.load(path_gen)['gen_opt'])
 disc.load_state_dict(torch.load(path_disc)['disc'])
 disc_opt.load_state_dict(torch.load(path_disc)['disc_opt'])
 
+# Define loss function 
+recon_criterion = losses.DiceLoss()
+adv_criterion = nn.BCEWithLogitsLoss() 
+lambda_reco = 1
+batch_size_train = 16
+batch_size_validation = 16
+
 # define dataset and dataloader for training
 train_dataset = DatasetProstate('../PROMISE12/',stats,mode='train')
 train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle=True)
@@ -119,12 +126,6 @@ train_loader = data.DataLoader(train_dataset,batch_size=batch_size_train,shuffle
 validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation')
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
-# Define loss function 
-recon_criterion = losses.DiceLoss()
-adv_criterion = nn.BCEWithLogitsLoss() 
-lambda_reco = 1
-batch_size_train = 16
-batch_size_validation = 16
 
 # pack models to send to training
 params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,paths[2]]
