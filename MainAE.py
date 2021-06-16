@@ -104,7 +104,7 @@ ae_opt.load_state_dict(torch.load(path_ae)['ae_opt'])
 
 # define loss function
 criterion = nn.MSELoss()
-lambda_reco = 1
+lambda_reco = 5
 lambda_latent = 1
 batch_size_train = 16
 batch_size_validation = 16

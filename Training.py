@@ -102,7 +102,7 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
     plt.plot(range(n_epochs),valid_gen_loss_vec,label='Validation Generator loss')
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Generator Loss for pix2pix network'); plt.legend()
-    result_path = path + 'Generator results.png'
+    result_path = path + '/Generator results.png'
     plt.savefig(result_path)
     plt.close('all')
     
@@ -111,7 +111,7 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
     plt.plot(range(n_epochs),valid_disc_loss_vec,label='Validation Discriminator loss')
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss'); plt.legend()
     plt.title('Discriminator Loss for pix2pix network')
-    result_path = path + 'Discriminator results.png'
+    result_path = path + '/Discriminator results.png'
     plt.savefig(result_path)
     
     # pack back 
@@ -193,7 +193,7 @@ def TrainerUnet(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for U-net network'); plt.legend()
     
-    result_path = path + 'results.png'
+    result_path = path + '/results.png'
     plt.savefig(result_path)
     
     # pack back

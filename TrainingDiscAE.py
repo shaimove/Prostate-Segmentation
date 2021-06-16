@@ -82,7 +82,7 @@ def TrainAE(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for AE network'); plt.legend()
     
-    result_path = path + 'results.png'
+    result_path = path + '/AE.png'
     plt.savefig(result_path)
     
     # pack back
@@ -183,7 +183,7 @@ def TrainDiscriminator(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for Discriminator'); plt.legend()
     
-    result_path = path + 'results.png'
+    result_path = path + '/Disc.png'
     plt.savefig(result_path)
     
     # pack back
