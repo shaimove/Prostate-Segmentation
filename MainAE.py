@@ -84,7 +84,7 @@ validation_dataset = DatasetProstate('../PROMISE12/',stats,mode='validation',Tra
 validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_validation,shuffle=True)
 
 # define loss function
-criterion = nn.MSELoss()
+criterion = losses.DiceLoss()
 
 # pack params, models and datasets
 params = [n_epochs,input_dim,target_shape,real_dim,lr,paths[1]]

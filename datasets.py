@@ -58,7 +58,7 @@ class DatasetProstate(Dataset):
             transforms.ToTensor()])
     
     def __len__(self):
-        return self.X.shape[0]
+        return self.Y.shape[0]
     
     def __getitem__(self,idx):
         # False for MRI images, and True for curropted segmentation images

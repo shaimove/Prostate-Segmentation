@@ -63,7 +63,7 @@ def TrainAE(params, models_opt_loss,datasets):
         ######################################
         ### Epoch Summary and save results ###
         ######################################
-        print('Epoch %d: Train MSE loss: %.3f, Validation MSE loss %.3f' 
+        print('Epoch %d: Train Dice loss: %.3f, Validation Dice loss %.3f' 
               % (epoch, train_loss, valid_loss))
         utils.show_images(seg_curr, real, output, 3, epoch, path,
                           size = (input_dim, target_shape, target_shape))
@@ -77,8 +77,8 @@ def TrainAE(params, models_opt_loss,datasets):
         
     # Plot training results
     plt.figure()
-    plt.plot(range(n_epochs),train_loss_vec,label='Training MSE Loss')
-    plt.plot(range(n_epochs),valid_loss_vec,label='Validation MSE Loss')
+    plt.plot(range(n_epochs),train_loss_vec,label='Training Dice Loss')
+    plt.plot(range(n_epochs),valid_loss_vec,label='Validation Dice Loss')
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for AE network'); plt.legend()
     
