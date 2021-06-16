@@ -26,8 +26,8 @@ paths = utils.CreateFolders(path,folders)
 # Load raw dataset and split to train/validation/test, need to be done only once!
 #(mean,std) = utils.ReadSplitData('../PROMISE12/',split = [0.7,0.15,0.15])
 stats = [0.41836,0.245641]
-batch_size_train = 16
-batch_size_validation = 16
+batch_size_train = 32
+batch_size_validation = 32
 
 # Training
 # Define training parameters
@@ -112,8 +112,10 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 
 # define loss function
 criterion = nn.MSELoss()
-lambda_reco = 0.05
-lambda_latent = 0.05
+lambda_reco = 1
+lambda_latent = 1
+batch_size_train = 16
+batch_size_validation = 16
 
 # pack params, models and datasets
 params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,lambda_latent,paths[2]]

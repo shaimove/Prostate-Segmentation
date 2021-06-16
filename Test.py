@@ -16,8 +16,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #%% Load test dataset
 # define states
 stats = [0.41836,0.245641]
-batch_size_test = 32
+batch_size_test = 16
 input_dim = 1; real_dim = 1;
+critertion = losses.DiceLoss()
 
 # define dataset and dataloader for training
 test_dataset = DatasetProstate('../PROMISE12/',stats,mode='test')
@@ -60,10 +61,10 @@ for batch in test_loader:
         output_unetSR = unetSR(condition)
         
         # Dice loss
-        loss_gen_batch = losses.DiceLoss(output_gen,real)
-        loss_unet_batch = losses.DiceLoss(output_unet,real)
-        loss_genSR_batch = losses.DiceLoss(output_genSR,real)
-        loss_unetSR_batch = losses.DiceLoss(output_unetSR,real)
+        loss_gen_batch = critertion(output_gen,real)
+        loss_unet_batch = critertion(output_unet,real)
+        loss_genSR_batch = critertion(output_genSR,real)
+        loss_unetSR_batch = critertion(output_unetSR,real)
         
         # add to loss
         loss_gen +=  loss_gen_batch.item() / len(test_loader)

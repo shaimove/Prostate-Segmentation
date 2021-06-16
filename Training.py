@@ -36,13 +36,13 @@ def TrainerPix2Pix(params, models_opt_loss,datasets):
             
             ### Update discriminator ###
             disc_opt.zero_grad() # zeros gradient before calculating loss
-            disc_loss = losses.get_disc_loss(gen, disc, real, condition, adv_criterion) # loss
+            disc_loss = losses.Discriminator_Loss(gen, disc, real, condition, adv_criterion) # loss
             disc_loss.backward(retain_graph=True) # Update gradients
             disc_opt.step() # Update optimizer
             
             ### Update generator ###
             gen_opt.zero_grad() # zeros gradient before calculating loss
-            fake,gen_loss = losses.get_gen_loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
+            fake,gen_loss = losses.Generator_Loss(gen, disc, real, condition, adv_criterion, recon_criterion, lambda_recon)
             gen_loss.backward() # Update gradients
             gen_opt.step() # Update optimizer
             

@@ -79,7 +79,7 @@ def TrainerGAN_FT(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for GAN SR Network'); plt.legend()
     
-    result_path = path + 'results.png'
+    result_path = path + '/results.png'
     plt.savefig(result_path)
 
 
@@ -156,7 +156,7 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for U-net SR Network'); plt.legend()
     
-    result_path = path + 'results.png'
+    result_path = path + '/results.png'
     plt.savefig(result_path)
 
 
