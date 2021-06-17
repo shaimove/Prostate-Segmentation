@@ -193,7 +193,7 @@ def TrainerUnet(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for U-net network'); plt.legend()
     
-    result_path = path + '/results.png'
+    result_path = path + '/unet.png'
     plt.savefig(result_path)
     
     # pack back

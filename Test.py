@@ -73,10 +73,11 @@ for batch in test_loader:
         loss_unetSR += loss_unetSR_batch.item() / len(test_loader)
                 
 # print results
-print('Dice Loss for GAN  is %.4f' % loss_gen)
-print('Dice Loss for GAN with SR is %.4f' % loss_genSR)
 print('Dice Loss for unet is %.4f' % loss_unet)
 print('Dice Loss for unet with SR is %.4f' % loss_unetSR)
+print('Dice Loss for pix2pix  is %.4f' % loss_gen)
+print('Dice Loss for pix2pix with SR is %.4f' % loss_genSR)
+
 
 
 

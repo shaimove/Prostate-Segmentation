@@ -79,7 +79,7 @@ def TrainerGAN_FT(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for GAN SR Network'); plt.legend()
     
-    result_path = path + '/results.png'
+    result_path = path + '/pix2pixSR.png'
     plt.savefig(result_path)
 
 
@@ -90,7 +90,7 @@ def TrainerGAN_FT(params, models_opt_loss,datasets):
 def TrainerUnetFT(params, models_opt_loss,datasets):
     # Unpack parameters for training and models
     n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,lambda_latent,path = params
-    unet,unet_opt,ae,ae_opt,criterion = models_opt_loss
+    unet,unet_opt,ae,ae_opt,criterion_reco,criterion_latent = models_opt_loss
     train_dataset,train_loader,validation_dataset,validation_loader = datasets
     
     # Loss vectors
@@ -109,7 +109,7 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
             
             ### Update model ###
             unet_opt.zero_grad() 
-            output,unet_loss = losses.Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent)
+            output,unet_loss = losses.Unet_FT_Loss(unet,ae,real,condition,criterion_reco,criterion_latent,lambda_reco,lambda_latent)
             unet_loss.backward(retain_graph=True) 
             unet_opt.step() 
 
@@ -129,7 +129,7 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
                 real = batch['Segmentation'].to(device)
                 
                 ### Loss ### 
-                fake,unet_loss = losses.Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent)
+                fake,unet_loss = losses.Unet_FT_Loss(unet,ae,real,condition,criterion_reco,criterion_latent,lambda_reco,lambda_latent)
                 valid_loss += unet_loss.item() / len(validation_loader)
         
         valid_loss_vec.append(valid_loss)
@@ -156,7 +156,7 @@ def TrainerUnetFT(params, models_opt_loss,datasets):
     plt.grid(); plt.xlabel('Number of epochs'); plt.ylabel('Loss')
     plt.title('Loss for U-net SR Network'); plt.legend()
     
-    result_path = path + '/results.png'
+    result_path = path + '/unetSR.png'
     plt.savefig(result_path)
 
 

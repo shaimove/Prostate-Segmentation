@@ -103,8 +103,9 @@ ae.load_state_dict(torch.load(path_ae)['ae'])
 ae_opt.load_state_dict(torch.load(path_ae)['ae_opt'])
 
 # define loss function
-criterion = nn.MSELoss()
-lambda_reco = 5
+criterion_latent = nn.MSELoss()
+criterion_reco = losses.DiceLoss()
+lambda_reco = 20
 lambda_latent = 1
 batch_size_train = 16
 batch_size_validation = 16
@@ -119,7 +120,7 @@ validation_loader = data.DataLoader(validation_dataset,batch_size=batch_size_val
 
 # pack params, models and datasets
 params = [n_epochs,input_dim,target_shape,real_dim,lr,lambda_reco,lambda_latent,paths[2]]
-models_opt_loss = [unet,unet_opt,ae,ae_opt,criterion]
+models_opt_loss = [unet,unet_opt,ae,ae_opt,criterion_reco,criterion_latent]
 datasets = [train_dataset,train_loader,validation_dataset,validation_loader]
 
 # Train the model

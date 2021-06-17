@@ -92,7 +92,7 @@ def Discriminator_Loss(gen, disc, real, condition, adv_criterion):
 
 #%% U-net Fine Tunning loss
 
-def Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent):
+def Unet_FT_Loss(unet,ae,real,condition,criterion_reco,criterion_latent,lambda_reco,lambda_latent):
     '''
     Loss function of the U-net fine tunning according to the paper.
 
@@ -126,16 +126,16 @@ def Unet_FT_Loss(unet,ae,real,condition,criterion,lambda_reco,lambda_latent):
     output_latent,output_ae = ae(output)
     
     # output should be the same!
-    loss_output = criterion(output,output_ae)
+    loss_output = criterion_latent(output,output_ae)
     
     # find the latent space representation of the segementation map
     real_latent,_ = ae(real)
     
     # output and real should be the same in the latent space!
-    loss_latent = criterion(output_latent,real_latent)
+    loss_latent = criterion_latent(output_latent,real_latent)
     
     # loss between segmentation maps
-    loss_reco = criterion(output,real)
+    loss_reco = criterion_reco(output,real)
     
     # final loss
     unet_FT_loss = loss_output + lambda_latent * loss_latent + lambda_reco * loss_reco

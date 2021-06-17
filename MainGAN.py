@@ -114,7 +114,8 @@ disc_opt.load_state_dict(torch.load(path_disc)['disc_opt'])
 # Define loss function 
 recon_criterion = losses.DiceLoss()
 adv_criterion = nn.BCEWithLogitsLoss() 
-lambda_reco = 5
+lambda_reco = 20
+lr = 0.00001
 batch_size_train = 16
 batch_size_validation = 16
 
