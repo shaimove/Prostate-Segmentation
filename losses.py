@@ -98,25 +98,20 @@ def Unet_FT_Loss(unet,ae,real,condition,criterion_reco,criterion_latent,lambda_r
 
     Parameters
     ----------
-    unet : TYPE
-        DESCRIPTION.
-    ae : TYPE
-        DESCRIPTION.
-    real : TYPE
-        DESCRIPTION.
-    condition : TYPE
-        DESCRIPTION.
-    criterion : TYPE
-        DESCRIPTION.
-    lambda_reco : TYPE
-        DESCRIPTION.
-    lambda_latent : TYPE
-        DESCRIPTION.
+    unet : U-net object to be fine-tunned
+    ae : Convolutional Auto encoder used for shape-regularization
+    real : Ground truth segmentation map 
+    condition : 2D MRI image
+    criterion_reco : Loss function for direct segmentation from condition to real
+    criterion_latent : Loss function for difference between ground truth segmentation 
+        map in the latent space and U-net output segmentation map in latent space.
+        the same for the distance between the output of the SR 
+    lambda_reco : the degree to which the reconstruction loss should be weighted
+    lambda_latent : the degree to which the distance in latent space should be weighted
 
     Returns
     -------
-    unet_FT_loss : TYPE
-        DESCRIPTION.
+    unet_FT_loss : Loss of the U-net fine-tunning  
 
     '''
     # Calculate output of U-net
@@ -152,25 +147,17 @@ def GAN_FT_Loss(gen,disc,real,condition,adv_criterion,recon_criterion,lambda_rec
 
     Parameters
     ----------
-    gen : TYPE
-        DESCRIPTION.
-    disc : TYPE
-        DESCRIPTION.
-    real : TYPE
-        DESCRIPTION.
-    condition : TYPE
-        DESCRIPTION.
-    adv_criterion : TYPE
-        DESCRIPTION.
-    recon_criterion : TYPE
-        DESCRIPTION.
-    lambda_reco : TYPE
-        DESCRIPTION.
+    gen : U-net object to be fine-tunned
+    disc : patchGAN trained to be shape reguliazer
+    real : Ground truth segmentation map 
+    condition : 2D MRI image
+    adv_criterion : loss function for adversarial loss from patchGAN
+    recon_criterion : Loss function for direct segmentation from condition to real
+    lambda_reco : the degree to which the reconstruction loss should be weighted
 
     Returns
     -------
-    gen_FT_loss : TYPE
-        DESCRIPTION.
+    gen_FT_loss : Loss of the U-net fine-tunning  
 
     '''
 

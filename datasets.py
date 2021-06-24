@@ -1,9 +1,7 @@
-import os
 import numpy as np
 import torch
 import torch.cuda
 from torch.utils.data import Dataset
-import torch.nn.functional as F
 from torchvision import transforms
 
 
