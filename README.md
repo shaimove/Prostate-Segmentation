@@ -41,6 +41,26 @@ Illustration of the GAN training:
 
  ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20fine%20tune.png)
 
+## Results and Discussion:  
+
+Our suggested work has several similarities and differences from the work suggested by the authors of [1]. 
+
+In both cases, we used U-net architecture to segment 2D medical images and we followed the same logical steps: training a U-net, training a shape regularizer (SR) using corrupted segmentation maps, and fine-tune the U-net using a loss function that force the U-net output and the SR output to be the same. 
+
+However, When we implemented Ravishankar et al. architecture, we used Dice loss instead of Binary cross-entropy loss, and we used PROMISE12dataset instead of their US dataset, which wasn’t available. We used the same U-net architecture when we reproduce the author's results and GAN’s generator. 
+
+In addition, the training process of the U-net was different (in our model, we used an adversarial loss from the discriminator), and different loss function in fine-tune step, since we don’t have a latent space in the GAN architecture.
+
+In the Hyperparameters tuning step, we found that a learning rate of 0.0001 yields the best results on the validation dataset, and reducing it in the fine-tuning step didn’t improve our results. 
+
+Since the authors didn’t specify the values of the regularization constants, we had to find them in the training process, and we found out that lamba1 equal to 1 and lambda2 equal to 20 results yield the best results on the validation dataset.
+
+In the GAN implementation, we found out that dropout layers in the U-net didn’t improve the results (dropout layers were suggested in the original pix2pix paper). The regularization constant of the dice loss in the first step was 200, in the fine-tuning step was 20. 
+
+When we compare the U-net performances with and without Shape Regularization, in both architectures, the dice loss improved by about 2%. This improvement was smaller than the 5% improvement introduced in the author's paper [1], and might be due to our use of dice loss rather than BCE loss, and also might result from different datasets for training. In addition, we saw that using GAN architecture for training wasn’t superior to a vanilla U-net implementation. 
+
+
+
 ## How to run the network?:  
 
 First, you need to download the PROMISE12 dataset from the competition website, or the following Kaggle link:
