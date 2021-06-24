@@ -59,7 +59,7 @@ In the GAN implementation, we found out that dropout layers in the U-net didn’
 
 When we compare the U-net performances with and without Shape Regularization, in both architectures, the dice loss improved by about 2%. This improvement was smaller than the 5% improvement introduced in the author's paper [1], and might be due to our use of dice loss rather than BCE loss, and also might result from different datasets for training. In addition, we saw that using GAN architecture for training wasn’t superior to a vanilla U-net implementation. 
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/results.png)
 
 ## How to run the network?:  
 
