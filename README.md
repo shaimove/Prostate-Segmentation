@@ -12,7 +12,7 @@ Illustration of the architecture:
 
 The authors of [1] first trained U in an unregularized manner (probably with BCE loss). Then, the authors created corrupted segmentation maps from the ground truth segmentation maps (or by using predicted segmentation maps resulted from early epochs), and train the AE to correct the corrupted images to the ground truth segmentation maps. As a final step, the authors freeze the learning of the AE, and using the following loss function and information from the latent space of the AE, they fine-tune U:
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20AE.png)
 
 The first term constrains the learning process only to U so the output of the auto-encoder and U-net will be the same. The second term ensures that the encoding of the ground truth and learned segmentation map will be close to each other in the latent space. The last term trains U directly.
 
@@ -23,25 +23,23 @@ We suggest improving the training process by replacing the auto-encoder with a d
 
 **The first step** will be to train the U-net G, using Adversarial Loss  from the discriminator (BCE with Logits) and Dice loss from semantic segmentation error (the authors didn't specify their metric for initial U-net training, probably Binary Cross Entropy - BCE). 
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20pix2pix%20g.png)
 
 The Discriminator will train using the adversarial loss (BCE with Logits), given the MRI 2D image, and real/generated segmentation map, the discriminator will be trained to distinguish between the real and generated segmentation map:
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20pix2pix%20d.png)
 
 Illustration of the GAN training:
 
  ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/explanation2.png)
 
-
-
 **The second phase** will be to train and discriminator, given the MRI 2D image, to distinguish between the ground truth segmentation maps and a corrupted segmentation maps. The corrupted images are the output of the generator after 25 epochs, the same method was used by the authors of [1] and marked as G[I]_c.
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20disc.png)
 
 **The third phase**, fine-tuning of the generator (U-net), training the with Dice loss on the semantic segmentation, and adversarial loss (BCE Logits) from the discriminator after shape regularization.  
 
-
+ ![Image 1](https://github.com/shaimove/Prostate-Segmentation/blob/main/Results/loss%20fine%20tune.png)
 
 ## How to run the network?:  
 
