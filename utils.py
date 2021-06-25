@@ -103,14 +103,38 @@ def show_images(condition, real, fake, num_images, epoch, path, size=(1, 256, 25
     
 #%% Create folders
 
-def CreateFolders(path,folders,folder_exists = False):
-    
+def CreateFolders(path,folders):
+    '''
+    Create folders or path strings to save results/models. 
+    we create the paths, which is sub-directory of 'path' with folder names in 
+    'folders'. if not exists, create them, if exists, only return paths list. 
+
+    Parameters
+    ----------
+    path : string
+        where to save every model?
+    folders : list of strings
+        names of folders in path.
+
+    Returns
+    -------
+    new_folders : list of strings
+        where to save the results and models.
+
+    '''
+    # create empty list
     new_folders = []
     
+    # in every folder name in folders list
     for folder in folders:
+        # create full path
         full_path = os.path.join(path,folder)
-        if folder_exists:
+        
+        # if folder don't exists, create it
+        if not os.path.isdir:
             os.mkdir(full_path)
+            
+        # add path to list
         new_folders.append(full_path)
         
     
